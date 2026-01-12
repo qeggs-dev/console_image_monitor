@@ -76,5 +76,13 @@ python console_image_monitor.py -s /path/to/image.png -rt fill -rm bicubic -ac �
 
 ---
 
+# License
+
 License: [MIT](LICENSE.md)
 Requirements Licenses: [Licenses](LICENSES.md)
+
+---
+
+# 相关仓库
+
+- [Sloves_Starter](https://github.com/qeggs-dev/Sloves_Starter)
