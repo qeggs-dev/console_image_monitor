@@ -33,8 +33,11 @@ class ConsoleImageMonitor:
             image = Image.fromarray(inverted_array)
         x, y = image.size
         show_x, show_y = os.get_terminal_size()
-        if x > show_x or y > show_y:
-            image = cls.center_crop(image, show_x, show_y)
+        if x > (show_x // 2) or y > show_y:
+            image = cls.center_crop(image, (show_x // 2), show_y)
+        
+        # Update image size
+        x, y = image.size
         
         pixels = image.load()
         try:
