@@ -1,6 +1,9 @@
 import os
 import sys
+import time
+import queue
 import argparse
+import threading
 import numpy as np
 
 from PIL import Image
@@ -41,20 +44,101 @@ class ConsoleImageMonitor:
         
         pixels = image.load()
         try:
-            for j in range(y):
+            sys.stdout.write(f"\033[?25l") # Hide cursor
+            for pixel_y in range(y):
                 line_buffer: list[str] = []
-                for i in range(x):
-                    pixel = pixels[i, j]
+                for pixel_x in range(x):
+                    pixel = pixels[pixel_x, pixel_y]
                     red, green, blue, alpha = pixel
                     alpha = alpha / 255.0
                     char = alpha_charset[int(alpha * (len(alpha_charset) - 1))]
-                    line_buffer.append(f"\033[38;2;{red};{green};{blue}m{char}\033[0m")
-                sys.stdout.write("".join(line_buffer))
+                    line_buffer.append((pixel_x, pixel_y, f"\033[38;2;{red};{green};{blue}m{char}\033[0m"))
+                sys.stdout.write("".join([char for x, y, char in line_buffer]))
                 sys.stdout.write("\n")
-                sys.stdout.flush()
         finally:
+            sys.stdout.write("\033[?25l") # Show cursor
             sys.stdout.write("\033[0m")
             sys.stdout.flush()
+    
+    @classmethod
+    def show_image_random(cls, image: Image.Image, alpha_charset: str = " ░▒▓█", color_reverse: bool = False, worker: int = 10):
+        image = image.convert('RGBA')
+        img_array = np.array(image)
+        if color_reverse:
+            inverted_array = 255 - img_array
+            image = Image.fromarray(inverted_array)
+        x, y = image.size
+        show_x, show_y = os.get_terminal_size()
+        if x > show_x or y > show_y:
+            image = cls.center_crop(image, show_x, show_y)
+        
+        # Update image size
+        x, y = image.size
+        
+        pixels = image.load()
+        threads: list[threading.Thread] = []
+        data_lock = threading.Lock()
+        submited: set[tuple[int, int]] = set()
+        processed: queue.Queue[tuple[int, int, str]] = queue.Queue()
+        finished = threading.Event()
+        start = threading.Event()
+        try:
+            sys.stderr.write(f"\033[?25l") # Hide cursor
+            def line_render():
+                while True:
+                    with data_lock:
+                        if len(submited) == 0:
+                            if finished.is_set():
+                                break
+                            time.sleep(0.05)
+                            continue
+                        pixel_x, pixel_y = submited.pop()
+                    pixel = pixels[pixel_x, pixel_y]
+                    red, green, blue, alpha = pixel
+                    alpha = alpha / 255.0
+                    char = alpha_charset[int(alpha * (len(alpha_charset) - 1))]
+                    processed.put((pixel_x, pixel_y, f"\033[38;2;{red};{green};{blue}m{char}\033[0m"))
+            
+            def printer():
+                sys.stderr.write("\n" * y)
+                while True:
+                    try:
+                        pixel_x, pixel_y, content = processed.get(timeout=0.1)
+                    except queue.Empty:
+                        if finished.is_set():
+                            break
+                        continue
+                    sys.stderr.write(f"\033[{pixel_y};{pixel_x}H")
+                    sys.stderr.write(content)
+            
+            for index in range(worker):
+                thread = threading.Thread(target=line_render, daemon=True)
+                thread.start()
+                threads.append(thread)
+            
+            printer_thread = threading.Thread(target=printer, daemon=True)
+            
+            for pixel_y in range(y):
+                for pixel_x in range(x):
+                    submited.add((pixel_x, pixel_y))
+            
+            printer_thread.start()
+            start.set()
+            
+            finished.set()
+
+            for thread in threads:
+                thread.join()
+
+            printer_thread.join()
+            
+            sys.stderr.flush()
+        finally:
+            sys.stderr.write("\033[?25l") # Show cursor
+            sys.stderr.write("\033[0m")
+            sys.stderr.write(f"\033[0;0m")
+            # sys.stderr.write("\n" * y)
+            sys.stderr.flush()
     
     def center_crop(img: Image.Image, crop_width: int, crop_height: int) -> Image.Image:
         width, height = img.size
@@ -111,6 +195,8 @@ def init_argparser() -> argparse.ArgumentParser:
     parser.add_argument("-rm", "--resize-mode", type=ImageResizeMode, default=ImageResizeMode.LANCZOS, help="The resize mode to use when displaying images in the console.")
     parser.add_argument("-ac", "--alpha-charset", type=str, default=" ░▒▓█", help="The charset to use for displaying alpha transparency.")
     parser.add_argument("-cr", "--color-reverse", action="store_true", help="Reverse the color of the image.")
+    parser.add_argument("-w", "--workers", type=int, default=10, help="The number of workers to use for rending images.")
+    parser.add_argument("-r", "--random-render", action="store_true", help="Render images randomly.")
     return parser
 
 def main():
@@ -128,11 +214,20 @@ def main():
             os.get_terminal_size().columns,
             os.get_terminal_size().lines,
         )
-    console_image_monitor.show_image(
-        display_image,
-        args.alpha_charset,
-        args.color_reverse,
-    )
+    
+    if args.random_render:
+        console_image_monitor.show_image_random(
+            display_image,
+            args.alpha_charset,
+            args.color_reverse,
+            args.workers
+        )
+    else:
+        console_image_monitor.show_image(
+            display_image,
+            args.alpha_charset,
+            args.color_reverse,
+        )
 
 if __name__ == "__main__":
     main()
