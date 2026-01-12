@@ -5,7 +5,6 @@ import numpy as np
 
 from PIL import Image
 from enum import StrEnum
-from dataclasses import dataclass
 
 class ImageResizeType(StrEnum):
     FILL = "fill"
