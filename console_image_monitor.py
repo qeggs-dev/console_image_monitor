@@ -56,7 +56,7 @@ class ConsoleImageMonitor:
                 sys.stdout.write("".join([char for x, y, char in line_buffer]))
                 sys.stdout.write("\n")
         finally:
-            sys.stdout.write("\033[?25l") # Show cursor
+            sys.stdout.write("\033[?25h") # Show cursor
             sys.stdout.write("\033[0m")
             sys.stdout.flush()
     
@@ -134,7 +134,7 @@ class ConsoleImageMonitor:
             
             sys.stderr.flush()
         finally:
-            sys.stderr.write("\033[?25l") # Show cursor
+            sys.stderr.write("\033[?25h") # Show cursor
             sys.stderr.write("\033[0m")
             sys.stderr.write(f"\033[0;0m")
             # sys.stderr.write("\n" * y)
