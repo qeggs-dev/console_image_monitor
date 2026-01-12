@@ -53,7 +53,7 @@ options:
 - `bilinear`：双线性
 - `bicubic`：三次样条
 - `lanczos`：拉科松
-- `box`：盒
+- `box`：盒子
 - `hamming`：汉明
 
 ### 缩放模式：
