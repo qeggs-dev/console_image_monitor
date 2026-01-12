@@ -24,7 +24,7 @@ Linux: `source .venv/bin/activate`
 ## 命令行参数：
 
 ``` bash
-usage: console_image_monitor.py [-h] -s SOURCE [-rt RESIZE_TYPE] [-rm RESIZE_MODE] [-ac ALPHA_CHARSET] [-cr]
+usage: console_image_monitor.py [-h] -s SOURCE [-rt RESIZE_TYPE] [-rm RESIZE_MODE] [-ac ALPHA_CHARSET] [-cr] [-w WORKERS] [-r]
 
 Monitor a image in the console.
 
@@ -32,21 +32,26 @@ options:
   -h, --help            show this help message and exit
   -s SOURCE, --source SOURCE
                         The source image path.
-  -rt RESIZE_TYPE, --resize_type RESIZE_TYPE
+  -rt RESIZE_TYPE, --resize-type RESIZE_TYPE
                         The resize mode to use when displaying images in the console.
-  -rm RESIZE_MODE, --resize_mode RESIZE_MODE
+  -rm RESIZE_MODE, --resize-mode RESIZE_MODE
                         The resize mode to use when displaying images in the console.
   -ac ALPHA_CHARSET, --alpha-charset ALPHA_CHARSET
                         The charset to use for displaying alpha transparency.
   -cr, --color-reverse  Reverse the color of the image.
+  -w WORKERS, --workers WORKERS
+                        The number of workers to use for rending images.
+  -r, --random-render   Render images randomly.
 ```
 
 ### 参数说明：
 - `--source`：要显示的图片路径
-- `--resize_type`：图片缩放方式
-- `--resize_mode`：图片缩放模式
+- `--resize-type`：图片缩放方式
+- `--resize-mode`：图片缩放模式
 - `--alpha-charset`：透明字符集
 - `--color-reverse`：是否反转颜色
+- `--workers`：渲染图片的线程数(需要启用`--random-render`)
+- `--random-render`：随机渲染图片
 
 ### 缩放方式：
 - `nearest`：最近邻
