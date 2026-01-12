@@ -214,6 +214,8 @@ def main():
             os.get_terminal_size().columns,
             os.get_terminal_size().lines,
         )
+    else:
+        display_image = image
     
     if args.random_render:
         console_image_monitor.show_image_random(
