@@ -33,8 +33,8 @@ class ConsoleImageMonitor:
             image = Image.fromarray(inverted_array)
         x, y = image.size
         show_x, show_y = os.get_terminal_size()
-        if x > (show_x // 2) or y > show_y:
-            image = cls.center_crop(image, (show_x // 2), show_y)
+        if x > show_x or y > show_y:
+            image = cls.center_crop(image, show_x, show_y)
         
         # Update image size
         x, y = image.size
@@ -48,7 +48,7 @@ class ConsoleImageMonitor:
                     red, green, blue, alpha = pixel
                     alpha = alpha / 255.0
                     char = alpha_charset[int(alpha * (len(alpha_charset) - 1))]
-                    line_buffer.append(f"\033[38;2;{red};{green};{blue}m{char*2}\033[0m")
+                    line_buffer.append(f"\033[38;2;{red};{green};{blue}m{char}\033[0m")
                 sys.stdout.write("".join(line_buffer))
                 sys.stdout.write("\n")
                 sys.stdout.flush()
@@ -94,12 +94,12 @@ class ConsoleImageMonitor:
         elif resize_type == ImageResizeType.WIDTH:
             ratio = height / width
             new_height = int(target_width * ratio)
-            return image.resize((target_width, new_height), resampling_mode)
+            return image.resize((target_width, int(new_height / 2)), resampling_mode)
         
         elif resize_type == ImageResizeType.HEIGHT:
             ratio = width / height
             new_width = int(target_height * ratio)
-            return image.resize((new_width, target_height), resampling_mode)
+            return image.resize((new_width * 2, target_height), resampling_mode)
         
         else:
             raise ValueError("Invalid resize type.")
