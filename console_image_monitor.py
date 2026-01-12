@@ -103,10 +103,10 @@ class ConsoleImageMonitor:
             raise ValueError("Invalid resize type.")
 
 def init_argparser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Monitor a directory for changes and display the changes in the console.")
-    parser.add_argument("-s", "--source", required=True, type = str, help="The directory to monitor.")
-    parser.add_argument("-rt", "--resize_type", type=ImageResizeType, default=ImageResizeType.FILL, help="The resize mode to use when displaying images in the console.")
-    parser.add_argument("-rm", "--resize_mode", type=ImageResizeMode, default=ImageResizeMode.LANCZOS, help="The resize mode to use when displaying images in the console.")
+    parser = argparse.ArgumentParser(description="Monitor a image in the console.")
+    parser.add_argument("-s", "--source", required=True, type = str, help="The source image path.")
+    parser.add_argument("-rt", "--resize-type", type=ImageResizeType, default=ImageResizeType.FILL, help="The resize mode to use when displaying images in the console.")
+    parser.add_argument("-rm", "--resize-mode", type=ImageResizeMode, default=ImageResizeMode.LANCZOS, help="The resize mode to use when displaying images in the console.")
     parser.add_argument("-ac", "--alpha-charset", type=str, default=" ░▒▓█", help="The charset to use for displaying alpha transparency.")
     parser.add_argument("-cr", "--color-reverse", action="store_true", help="Reverse the color of the image.")
     return parser
