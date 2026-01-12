@@ -1,0 +1,36 @@
+{
+    "title": "Console Image Monitor",
+    "python_name": {
+        "windows": "python",
+        "linux": "python3",
+        "macos": "python3",
+        "jvm": "python3",
+        "default": "python3"
+    },
+    "pip_name": {
+        "windows": "pip",
+        "linux": "pip3",
+        "macos": "pip3",
+        "jvm": "pip3",
+        "default": "pip3"
+    },
+    "requirements": [
+        "pillow",
+        "numpy",
+        "colorama"
+    ],
+    "use_venv": true,
+    "venv_prompt": "venv",
+    "script_name": null,
+    "argument": null,
+    "restart": false,
+    "reselect": false,
+    "run_cmd_need_to_ask": false,
+    "ask_default_values": {},
+    "divider_line_char": "=",
+    "text_encoding": "utf-8",
+    "print_return_code": true,
+    "print_runtime": true,
+    "automatic_exit": true,
+    "allow_print": true
+}
